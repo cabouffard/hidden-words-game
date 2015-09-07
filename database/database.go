@@ -1,8 +1,9 @@
-package main
+package database
 
 import (
 	"database/sql"
 	"fmt"
+	"github.com/cabouffard/mot_cache/helpers"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os"
@@ -44,7 +45,7 @@ func (orm *ORM) FindWord(query string) (string, error) {
 		words = append(words, value)
 	}
 	if len(words) > 0 {
-		return words[random(0, len(words))], nil
+		return words[helpers.Random(0, len(words))], nil
 	} else {
 		return "", fmt.Errorf("Unable to find a word corresponding to the query: %v", query)
 	}

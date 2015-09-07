@@ -1,7 +1,9 @@
-package main
+package game
 
 import (
 	"fmt"
+	"github.com/cabouffard/mot_cache/database"
+	"github.com/cabouffard/mot_cache/helpers"
 )
 
 const GridNilValue rune = '_'
@@ -10,7 +12,7 @@ type Board struct {
 	grid  [][]rune
 	size  int
 	words []string
-	orm   *ORM
+	orm   *database.ORM
 }
 
 func NewBoard(size int) *Board {
@@ -25,7 +27,7 @@ func NewBoard(size int) *Board {
 		}
 	}
 
-	orm := InitDatabase("./words.db")
+	orm := database.InitDatabase("./words.db")
 	orm = orm.Reset()
 	return &Board{grid: grid, size: size, orm: orm}
 }
@@ -42,8 +44,8 @@ func NewTestBoard() *Board {
 }
 
 func (board *Board) SelectWordPosition(orientation Orientation, wordLength int) (int, int) {
-	x := random(0, board.size)
-	y := random(0, board.size)
+	x := helpers.Random(0, board.size)
+	y := helpers.Random(0, board.size)
 	if orientation == S || orientation == N || orientation == SE || orientation == NW {
 		totalLength := y + wordLength
 		for totalLength > board.size {
@@ -65,11 +67,11 @@ func (board *Board) SelectWordPosition(orientation Orientation, wordLength int) 
 
 func (board *Board) SelectOrientation() Orientation {
 	nbOrientations := len(orientations)
-	return Orientation(random(1, nbOrientations+1))
+	return Orientation(helpers.Random(1, nbOrientations+1))
 }
 
 func (board *Board) SelectWordLength() int {
-	length := random(3, board.size)
+	length := helpers.Random(3, board.size)
 	return length
 }
 
@@ -89,7 +91,7 @@ func (board *Board) FindQuery(x, y int, orientation Orientation, wordLength int)
 				query = query + s
 			}
 			if orientation == N {
-				query = reverse(query)
+				query = helpers.Reverse(query)
 			}
 		}
 	}
@@ -107,11 +109,11 @@ func (board *Board) FindQuery(x, y int, orientation Orientation, wordLength int)
 	// 			query = query + s
 	// 		}
 	// 		if orientation == N {
-	// 			query = reverse(query)
+	// 			query = helpers.Reverse(query)
 	// 		}
 	//
 	// 		if orientation == SW {
-	// 			query = reverse(query)
+	// 			query = helpers.Reverse(query)
 	// 	}
 	// }
 
@@ -128,7 +130,7 @@ func (board *Board) FindQuery(x, y int, orientation Orientation, wordLength int)
 				query = query + s
 			}
 			if orientation == N {
-				query = reverse(query)
+				query = helpers.Reverse(query)
 			}
 		}
 	}
@@ -143,7 +145,7 @@ func (board *Board) FindQuery(x, y int, orientation Orientation, wordLength int)
 				query = query + s
 			}
 			if orientation == W {
-				query = reverse(query)
+				query = helpers.Reverse(query)
 			}
 		}
 	}
@@ -158,7 +160,7 @@ func (board *Board) FindWord(query string) (string, error) {
 	}
 
 	testCount := 0
-	for stringInSlice(foundWord, board.words) {
+	for helpers.StringInSlice(foundWord, board.words) {
 		testCount += 1
 		foundWord, err = board.orm.FindWord(query)
 		if err != nil {
@@ -177,7 +179,7 @@ func (board *Board) SetWord(word *Word) {
 		for i := word.y; i < word.y+word.length; i++ {
 			value := word.value
 			if word.orientation == N {
-				value = reverse(word.value)
+				value = helpers.Reverse(word.value)
 			}
 			r := rune([]rune(value)[i-word.y])
 			board.Set(word.x, i, r)
@@ -190,7 +192,7 @@ func (board *Board) SetWord(word *Word) {
 	// 		x := word.x + i
 	// 		value := word.value
 	// 		if word.orientation == SW {
-	// 			value = reverse(word.value)
+	// 			value = helpers.Reverse(word.value)
 	// 		}
 	// 		r := rune([]rune(value)[i])
 	// 		board.Set(x, y, r)
@@ -203,7 +205,7 @@ func (board *Board) SetWord(word *Word) {
 			x := word.x + i
 			value := word.value
 			if word.orientation == NW {
-				value = reverse(word.value)
+				value = helpers.Reverse(word.value)
 			}
 			r := rune([]rune(value)[i])
 			board.Set(x, y, r)
@@ -214,7 +216,7 @@ func (board *Board) SetWord(word *Word) {
 		for i := word.x; i < word.x+word.length; i++ {
 			value := word.value
 			if word.orientation == W {
-				value = reverse(word.value)
+				value = helpers.Reverse(word.value)
 			}
 			r := rune([]rune(value)[i-word.x])
 			board.Set(i, word.y, r)
@@ -223,7 +225,7 @@ func (board *Board) SetWord(word *Word) {
 	board.words = append(board.words, word.value)
 }
 
-func (board *Board) printListWords() {
+func (board *Board) PrintListWords() {
 	println("List of words: ")
 	for _, word := range board.words {
 		println(word)

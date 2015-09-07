@@ -2,34 +2,51 @@ package main
 
 import (
 	"fmt"
+	"github.com/cabouffard/mot_cache/game"
 )
 
-func main() {
-	// board := NewTestBoard()
-	board := NewBoard(16)
+type HiddenWords struct {
+	board *game.Board
+}
 
-	fmt.Printf("STARTS \n")
+func NewHiddenWords(size int) *HiddenWords {
+	board := game.NewBoard(size)
 
-	// for i := 0; i < 500; i++ {
-	for board.NbFreeSpace() > 30 {
-		orientation := board.SelectOrientation()
-		wordLength := board.SelectWordLength()
-		x, y := board.SelectWordPosition(orientation, wordLength)
+	return &HiddenWords{board: board}
+}
+
+func (hw *HiddenWords) PlayGame() {
+	fmt.Printf("GAME HAS STARTED! \n")
+	for hw.board.NbFreeSpace() > 40 {
+		orientation := hw.board.SelectOrientation()
+		wordLength := hw.board.SelectWordLength()
+		x, y := hw.board.SelectWordPosition(orientation, wordLength)
 		// println()
 		// fmt.Printf("x: %d, y: %d\n", x+1, y+1)
 		// fmt.Printf("orientation: %v \n", orientation)
 		// fmt.Printf("length: %v \n", wordLength)
-		query := board.FindQuery(x, y, orientation, wordLength)
-		foundWord, err := board.FindWord(query)
+		query := hw.board.FindQuery(x, y, orientation, wordLength)
+		foundWord, err := hw.board.FindWord(query)
 		if err != nil {
 			// fmt.Printf("%v \n", err)
 			continue
 		}
-		word := NewWord(foundWord, x, y, orientation)
+		word := game.NewWord(foundWord, x, y, orientation)
 
 		// fmt.Printf("word: %v \n", word)
-		board.SetWord(word)
+		hw.board.SetWord(word)
 	}
-	fmt.Printf("%v \n", board)
-	board.printListWords()
+	fmt.Printf("%v \n", hw.board)
+	hw.board.PrintListWords()
+}
+
+func play() {
+	game := NewHiddenWords(16)
+	game.PlayGame()
+}
+
+func main() {
+	if true {
+		play()
+	}
 }
