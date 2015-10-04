@@ -79,6 +79,10 @@ func (board *Board) Set(x, y int, value rune) {
 	board.grid[y][x] = value
 }
 
+func (board *Board) GetGrid() [][]rune {
+	return board.grid
+}
+
 func (board *Board) FindQuery(x, y int, orientation Orientation, wordLength int) string {
 	var query string = ""
 	if orientation == S || orientation == N {

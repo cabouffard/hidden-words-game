@@ -1,8 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/cabouffard/mot_cache/game"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
 )
 
 type HiddenWords struct {
@@ -41,12 +45,24 @@ func (hw *HiddenWords) PlayGame() {
 }
 
 func play() {
-	game := NewHiddenWords(16)
-	game.PlayGame()
+	// game := NewHiddenWords(16)
+	// game.PlayGame()
 }
 
 func main() {
-	if true {
-		play()
-	}
+	// play()
+
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/game", Index)
+
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func Index(w http.ResponseWriter, r *http.Request) {
+	game := NewHiddenWords(16)
+
+	json.NewEncoder(w).Encode(game.board.GetGrid())
+
+	c.HTML(http.StatusOK, "index.html", nil)
+	// String.fromCharCode(10)
 }
